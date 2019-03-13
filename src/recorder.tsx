@@ -8,7 +8,7 @@ export interface IRecorderProps {
 
 export interface IRecorderState {
     clips: IClipInfo[];
-    status: "initializing" | "ready" | "recording" | "done" | "paused";
+    status: "initializing" | "ready" | "armed" | "recording" | "done" | "paused"; // it looks like mediarecorder is reusable after stopping.
     recording?: "waiting for audio" | "detected sound recently" | "recording a track";
 }
 
