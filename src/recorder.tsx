@@ -16,6 +16,8 @@ export interface IRecorderState {
 export class Recorder extends Component<IRecorderProps, IRecorderState> {
     private mediaRecorder?: MediaRecorder;
 
+    private lastNoiseCounter = 0;
+
     // currently recording chunks
     private chunks: Blob[] = [];
 
@@ -65,6 +67,23 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                         var max = -100000000000000;
                         dataArray.forEach(v => { min = Math.min(v, min); max = Math.max(v, max); });
 
+                        if (max > 140 || min < 100) {
+                            this.lastNoiseCounter = 0;
+                                // if we aren't recording we should start!
+                                if(this.state.status != "recording"){
+                                    this.record();
+                                }
+                        }
+                        else {
+                            this.lastNoiseCounter++;
+                            if(this.lastNoiseCounter > 15){
+                                // if we are recording we should stop!
+                                if(this.state.status == "recording"){
+                                    this.stop();
+                                }
+                            }
+                        }
+
                         //fullBuffer = fullBuffer.concat(Array.from(dataArray));
                         this.waveform.concat([min, max]);
 
@@ -87,6 +106,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
 
                             if (this.waveform[i] > 140 || this.waveform[i] < 100) {
                                 canvasCtx.strokeStyle = 'rgb(255, 0, 0)';
+
                             }
                             else {
                                 canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
