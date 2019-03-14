@@ -158,10 +158,8 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                         const audioUrl = window.URL.createObjectURL(blob);
                         const clipInfo: IClipInfo = {
                             audioUrl,
-                            name: "Track " + this.trackCount,
                             waveform: this.waveform,
-                            trackNumber: this.trackCount,
-                        };
+                        } as IClipInfo;
 
                         // TODO: we should have a way to MANUALLY SAVE and MANUALLY SKIP
                         // eg stop/save or trash can button
@@ -208,6 +206,8 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
     }
 
     private saveClip = (clipInfo: IClipInfo) => {
+        clipInfo.name = "Track " + this.trackCount;
+        clipInfo.trackNumber = this.trackCount;
         this.trackCount++;
         this.setState({ clips: [...this.state.clips, clipInfo], lastClip: undefined });
         this.lastClip = undefined;
@@ -295,7 +295,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
             <div style={{ marginBottom: "50px", flex: "none", display: "flex", flexDirection: "row", textAlign: "center", justifyContent: "center" }}>
                 {(status == "recording" || status == "armed") ? <div>{this.name}</div> : <input type="textarea" defaultValue={this.name} onChange={e => { this.name = e.target.value; }} placeholder={"Name your session"} />}
                 <input type="checkbox" onChange={e => { this.download = e.target.checked; }} /> Save
-                {(status!="recording" && lastClip) && <button onClick={()=>{ this.saveClip(lastClip); }}>Save Last</button>}
+                {(status!="recording" && lastClip) && <button onClick={()=>{ this.saveClip(lastClip); }}>Save Last clip</button>}
             </div>
         </div>;
     }
