@@ -18,11 +18,11 @@ export class Visualizer extends Component<IVisualizerProps, IVisualizerState> {
         var WIDTH = this.clipCanvas.width
         var HEIGHT = this.clipCanvas.height;
 
-        canvasCtx.fillStyle = 'rgb(255, 255, 255)';
+        canvasCtx.fillStyle = 'rgb(25, 25, 25)';
         canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
         canvasCtx.lineWidth = 2;
-        canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+        canvasCtx.strokeStyle = 'rgb(225, 225, 225)';
 
 
         var sliceWidth = WIDTH * 1.0 / this.props.waveform.length;
@@ -30,32 +30,33 @@ export class Visualizer extends Component<IVisualizerProps, IVisualizerState> {
 
         var lastX = 0;
         var lastY = HEIGHT / 2;
+        canvasCtx.beginPath();
+        canvasCtx.moveTo(lastX, lastY);
 
         for (var i = 0; i < this.props.waveform.length; i++) {
             var v = this.props.waveform[i] / 128.0;
             var y = v * HEIGHT / 2;
 
             if (this.props.waveform[i] > 140 || this.props.waveform[i] < 100) {
-                canvasCtx.strokeStyle = 'rgb(255, 0, 0)';
+                //canvasCtx.strokeStyle = 'rgb(255, 0, 0)';
             }
             else {
-                canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+                //canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
             }
 
-            canvasCtx.beginPath();
-            canvasCtx.moveTo(lastX, lastY);
             canvasCtx.lineTo(x, y);
-            canvasCtx.stroke();
 
             lastX = x;
             lastY = y;
 
             x += sliceWidth;
         }
+
+        canvasCtx.stroke();
     }
 
     render() {
-        return <canvas height="50" ref={c => { if(!this.clipCanvas && c){
+        return <canvas height="50" width="1000" ref={c => { if(!this.clipCanvas && c){
             this.clipCanvas = c;
             this.setState({clipCanvas: c});
         } }} style={{ flex: "auto" }} />;

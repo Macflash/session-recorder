@@ -16,6 +16,9 @@ export interface IRecorderState {
 export class Recorder extends Component<IRecorderProps, IRecorderState> {
     private mediaRecorder?: MediaRecorder;
 
+    private name?: string;
+    private download = false;
+    private saveMode: "saveNext" | "autodecide"| "skipNext" = "autodecide";
     private lastNoiseCounter = 0;
 
     // currently recording chunks
@@ -54,44 +57,45 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
 
                         analyser.getByteTimeDomainData(dataArray);
 
-                        this.waveform = this.waveform.concat(Array.from(dataArray));
-
-                        const maxSilence = 75000;
-                        if(this.state.status != "recording"){
-                            if(this.waveform.length > maxSilence){
-                                this.waveform = this.waveform.slice(this.waveform.length - maxSilence);
-                            }
-                        }
 
                         var min = 100000000000000;
                         var max = -100000000000000;
                         dataArray.forEach(v => { min = Math.min(v, min); max = Math.max(v, max); });
 
+                        this.waveform = this.waveform.concat([min, max]);
+
+                        const maxSilence = 100;
+
+                        if (this.state.status != "recording") {
+                            if (this.waveform.length > maxSilence) {
+                                this.waveform = this.waveform.slice(this.waveform.length - maxSilence);
+                            }
+                        }
+
                         if (max > 140 || min < 100) {
                             this.lastNoiseCounter = 0;
-                                // if we aren't recording we should start!
-                                if(this.state.status != "recording"){
-                                    this.record();
-                                }
+                            // if we aren't recording we should start!
+                            if (this.state.status == "armed") {
+                                this.record();
+                            }
                         }
                         else {
                             this.lastNoiseCounter++;
-                            if(this.lastNoiseCounter > 15){
-                                // if we are recording we should stop!
-                                if(this.state.status == "recording"){
-                                    this.stop();
+                            if (this.lastNoiseCounter > maxSilence) {
+                                // if we are recording we should stop by stay armed.
+                                if (this.state.status == "recording") {
+                                    this.split();
                                 }
                             }
                         }
 
-                        //fullBuffer = fullBuffer.concat(Array.from(dataArray));
-                        this.waveform.concat([min, max]);
 
-                        canvasCtx.fillStyle = 'rgb(200, 200, 200)';
+                        canvasCtx.fillStyle = 'rgb(25, 25, 25)';
                         canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
                         canvasCtx.lineWidth = 2;
-                        canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+                        canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
+                        //canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
 
 
                         var sliceWidth = WIDTH * 1.0 / this.waveform.length;
@@ -99,23 +103,25 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
 
                         var lastX = 0;
                         var lastY = HEIGHT / 2;
+                        canvasCtx.beginPath();
+                        canvasCtx.moveTo(lastX, lastY);
 
                         for (var i = 0; i < this.waveform.length; i++) {
                             var v = this.waveform[i] / 128.0;
                             var y = v * HEIGHT / 2;
 
                             if (this.waveform[i] > 140 || this.waveform[i] < 100) {
-                                canvasCtx.strokeStyle = 'rgb(255, 0, 0)';
+                                //canvasCtx.strokeStyle = 'rgb(255, 0, 0)';
 
                             }
                             else {
-                                canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+                                //canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
                             }
 
-                            canvasCtx.beginPath();
-                            canvasCtx.moveTo(lastX, lastY);
+                            //canvasCtx.beginPath();
+                            //canvasCtx.moveTo(lastX, lastY);
                             canvasCtx.lineTo(x, y);
-                            canvasCtx.stroke();
+                            //canvasCtx.stroke();
 
                             lastX = x;
                             lastY = y;
@@ -124,7 +130,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                         }
 
                         canvasCtx.lineTo(canvas.width, canvas.height / 2);
-                        //canvasCtx.stroke();
+                        canvasCtx.stroke();
 
                     }
 
@@ -150,15 +156,44 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                             waveform: this.waveform,
                             trackNumber: this.trackCount,
                         };
+
+                        // TODO: we should have a way to MANUALLY SAVE and MANUALLY SKIP
+                        // eg stop/save or trash can button
+
+                        // this is where we should decide if we keep it or not...
+                        // if it is really short DONT keep it.
+
+                        if(this.saveMode == "autodecide"){
+                            console.log("waveform length: " + clipInfo.waveform.length)
+                            const minSaveLength = 1000;
+                            if(clipInfo.waveform.length < minSaveLength){
+                                console.log("skip saving the track since it is so short");
+                                return;
+                            }
+    
+                            // also skip if it has very little CONTENT as a percentage. especially for very short lcips.
+                        }
+                        if(this.saveMode == "skipNext"){
+                            // only skip one
+                            this.saveMode = "autodecide";
+                            console.log("skip saving because we are in skipNext save mode");
+                            return;
+                        }
+                        if(this.saveMode == "saveNext"){
+                            // only save one
+                            this.saveMode = "autodecide";
+                            console.log("force saving because we are in saveNext save mode");
+                        }
+
                         this.trackCount++;
                         this.setState({ clips: [...this.state.clips, clipInfo] });
                         this.waveform = [];
 
                         var link = document.createElement("a"); // Or maybe get it from the current document
                         link.href = audioUrl;
-                        link.download = name + ".webm";
+                        link.download = (this.name ? this.name + "_" : "") + name + ".webm";
                         document.body.appendChild(link);
-                        //link.click();
+                        this.download && link.click();
                     }
                     this.setState({ status: "ready" });
                 }).catch(function (err) {
@@ -205,6 +240,8 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
             throw "No recorder!";
         }
 
+        this.mediaRecorder.stop();
+        this.setState({ status: "armed" }); // not sure this is right!
     }
 
     public stop = () => {
@@ -212,31 +249,40 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
             throw "No recorder!";
         }
 
-        this.mediaRecorder.stop();
-        this.setState({ status: "ready" }); // not sure this is right!
+        if(this.mediaRecorder.state == "recording" || this.mediaRecorder.state == "paused"){
+            this.mediaRecorder.stop();
+        }
+
+        this.setState({ status: "ready" });
     }
 
     render() {
         const { status, clips } = this.state;
-        return <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-            <div style={{ overflow: "auto", flex: "auto", minHeight: "50%" }}>
+        return <div style={{ display: "flex", flexDirection: "column", height: "100%", justifyContent: "flex-end" }}>
+            <div style={{justifyContent: "center", alignItems: "center", margin: "10px", display:"flex", fontSize: "125%"}}> { (status == "recording" || status == "armed") && "Recording" } {this.name}</div>
+            <div style={{ overflow: "auto", flex: "auto", margin: "25px 10px" }}>
                 {clips.map((clip, i) => {
-                    return <ClipInfo key={i} clipInfo={clip} />
+                    return <ClipInfo key={i} clipInfo={clip} onDelete={()=>{
+                        var removed = clips.splice(i, 1);
+                        this.setState({clips: clips.slice() })}} />
                 })}
             </div>
-            <div style={{ flex: "none" }}>
-                <canvas className="visualizer" width="300" height="100" />
+            <div style={{ flex: "none", textAlign: "center", justifyContent: "center" }}>
+                <canvas className="visualizer" height="100" width="1000" style={{ width: "100%" }} />
+            </div>
+            <div style={{ flex: "none", textAlign: "center", justifyContent: "center" }}>
                 {status}
-                <div>
-                    {status == "ready" &&
-                        <button onClick={this.record}>Record</button>}
-                    {status == "recording" &&
-                        <button onClick={this.pause}>Pause</button>}
-                    {status == "recording" &&
-                        <button onClick={this.stop}>Stop</button>}
-                    {status == "paused" &&
-                        <button onClick={this.resume}>Resume</button>}
-                </div>
+            </div>
+            <div style={{ flex: "none", display: "flex", flexDirection: "row", textAlign: "center", justifyContent: "center", alignItems: "center" }}>
+                {status == "ready" &&
+                    <button onClick={() => { this.setState({ status: "armed" })}} title="Arm for recording" style={{height: "50px", width: "50px", borderRadius: "100px", backgroundColor: "rgb(225,0,0)", border: "none", margin: "10px", cursor: "pointer"}}/>}
+                {(status == "recording" ) && <button onClick={()=>{ this.saveMode = "saveNext"; this.split()}}>Save</button>}
+                {(status == "recording" || status == "armed") && <button onClick={this.stop} title="Stop" style={{height: "50px", width: "50px", border: "none", backgroundColor:"grey", cursor: "pointer", margin: "10px"}}/>}
+                {(status == "recording") && <button onClick={()=>{ this.saveMode = "skipNext"; this.split()}}>Skip</button>}
+            </div>
+            <div style={{ marginBottom: "50px", flex: "none", display: "flex", flexDirection: "row", textAlign: "center", justifyContent: "center" }}>
+                {(status == "recording" || status == "armed") ? <div>{this.name}</div> : <input type="textarea" defaultValue={this.name} onChange={e => { this.name = e.target.value; }} placeholder={"Name your session"} />}
+                <input type="checkbox" onChange={e => { this.download = e.target.checked; }} /> Save
             </div>
         </div>;
     }
