@@ -1,13 +1,13 @@
 {
   "main.css": "/session-recorder/static/css/main.82b357ca.chunk.css",
-  "main.js": "/session-recorder/static/js/main.b808bff2.chunk.js",
-  "main.js.map": "/session-recorder/static/js/main.b808bff2.chunk.js.map",
+  "main.js": "/session-recorder/static/js/main.cf936506.chunk.js",
+  "main.js.map": "/session-recorder/static/js/main.cf936506.chunk.js.map",
   "runtime~main.js": "/session-recorder/static/js/runtime~main.68756b9b.js",
   "runtime~main.js.map": "/session-recorder/static/js/runtime~main.68756b9b.js.map",
   "static/js/2.4214afab.chunk.js": "/session-recorder/static/js/2.4214afab.chunk.js",
   "static/js/2.4214afab.chunk.js.map": "/session-recorder/static/js/2.4214afab.chunk.js.map",
   "index.html": "/session-recorder/index.html",
-  "precache-manifest.037473a29a649c8b2358451eab6876e8.js": "/session-recorder/precache-manifest.037473a29a649c8b2358451eab6876e8.js",
+  "precache-manifest.01beb3905ea0742e428df03f296884c8.js": "/session-recorder/precache-manifest.01beb3905ea0742e428df03f296884c8.js",
   "service-worker.js": "/session-recorder/service-worker.js",
   "static/css/main.82b357ca.chunk.css.map": "/session-recorder/static/css/main.82b357ca.chunk.css.map"
 }
