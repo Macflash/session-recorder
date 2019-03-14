@@ -7,6 +7,7 @@ export interface IRecorderProps {
 }
 
 export interface IRecorderState {
+    lastClip?: IClipInfo;
     clips: IClipInfo[];
     status: "initializing" | "ready" | "armed" | "recording" | "done" | "paused"; // it looks like mediarecorder is reusable after stopping.
     recording?: "waiting for audio" | "detected sound recently" | "recording a track";
@@ -16,6 +17,7 @@ export interface IRecorderState {
 export class Recorder extends Component<IRecorderProps, IRecorderState> {
     private mediaRecorder?: MediaRecorder;
 
+    private lastClip?: IClipInfo;
     private name?: string;
     private download = false;
     private saveMode: "saveNext" | "autodecide"| "skipNext" = "autodecide";
@@ -163,6 +165,8 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                         // this is where we should decide if we keep it or not...
                         // if it is really short DONT keep it.
 
+                        this.lastClip = clipInfo;
+                        this.setState({lastClip: clipInfo});
                         if(this.saveMode == "autodecide"){
                             console.log("waveform length: " + clipInfo.waveform.length)
                             const minSaveLength = 1000;
@@ -185,15 +189,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                             console.log("force saving because we are in saveNext save mode");
                         }
 
-                        this.trackCount++;
-                        this.setState({ clips: [...this.state.clips, clipInfo] });
-                        this.waveform = [];
-
-                        var link = document.createElement("a"); // Or maybe get it from the current document
-                        link.href = audioUrl;
-                        link.download = (this.name ? this.name + "_" : "") + name + ".webm";
-                        document.body.appendChild(link);
-                        this.download && link.click();
+                        this.saveClip(clipInfo);
                     }
                     this.setState({ status: "ready" });
                 }).catch(function (err) {
@@ -206,6 +202,19 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
         }
 
         this.state = { status: "initializing", clips: [] };
+    }
+
+    private saveClip = (clipInfo: IClipInfo) => {
+        this.trackCount++;
+        this.setState({ clips: [...this.state.clips, clipInfo], lastClip: undefined });
+        this.lastClip = undefined;
+        this.waveform = [];
+
+        var link = document.createElement("a"); // Or maybe get it from the current document
+        link.href = clipInfo.audioUrl;
+        link.download = (this.name ? this.name + "_" : "") + name + ".webm";
+        document.body.appendChild(link);
+        this.download && link.click();
     }
 
     public record = () => {
@@ -257,7 +266,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
     }
 
     render() {
-        const { status, clips } = this.state;
+        const { status, clips, lastClip } = this.state;
         return <div style={{ display: "flex", flexDirection: "column", height: "100%", justifyContent: "flex-end" }}>
             <div style={{justifyContent: "center", alignItems: "center", margin: "10px", display:"flex", fontSize: "125%"}}> { (status == "recording" || status == "armed") && "Recording" } {this.name}</div>
             <div style={{ overflow: "auto", flex: "auto", margin: "25px 10px" }}>
@@ -283,6 +292,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
             <div style={{ marginBottom: "50px", flex: "none", display: "flex", flexDirection: "row", textAlign: "center", justifyContent: "center" }}>
                 {(status == "recording" || status == "armed") ? <div>{this.name}</div> : <input type="textarea" defaultValue={this.name} onChange={e => { this.name = e.target.value; }} placeholder={"Name your session"} />}
                 <input type="checkbox" onChange={e => { this.download = e.target.checked; }} /> Save
+                {(status!="recording" && lastClip) && <button onClick={()=>{ this.saveClip(lastClip); }}>Save Last</button>}
             </div>
         </div>;
     }
