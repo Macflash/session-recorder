@@ -153,7 +153,6 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                         this.chunks.push(e.data);
                     }
                     this.mediaRecorder.onstop = (e) => {
-                        const name = "test";
                         const blob = new Blob(this.chunks, { 'type': 'audio/webm' });
                         this.chunks = [];
                         const audioUrl = window.URL.createObjectURL(blob);
