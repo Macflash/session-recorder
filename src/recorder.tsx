@@ -17,6 +17,8 @@ export interface IRecorderState {
 export class Recorder extends Component<IRecorderProps, IRecorderState> {
     private mediaRecorder?: MediaRecorder;
 
+    private readonly maxSilence = 100;
+    private readonly minSaveLength = 1000;
     private lastClip?: IClipInfo;
     private name?: string;
     private download = false;
@@ -66,11 +68,14 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
 
                         this.waveform = this.waveform.concat([min, max]);
 
-                        const maxSilence = 100;
 
                         if (this.state.status != "recording") {
-                            if (this.waveform.length > maxSilence) {
-                                this.waveform = this.waveform.slice(this.waveform.length - maxSilence);
+                            // there are some... race conditions here depending on when the recording gets stopped.
+                            // should either fix this or ensure we don't trim VALID recordings
+                            // it should never be able to get out of this region, but bad things would happen if it did?
+                            if (this.waveform.length > this.maxSilence && this.waveform.length < this.minSaveLength) 
+                            {
+                                this.waveform = this.waveform.slice(this.waveform.length - this.maxSilence);
                             }
                         }
 
@@ -83,7 +88,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                         }
                         else {
                             this.lastNoiseCounter++;
-                            if (this.lastNoiseCounter > maxSilence) {
+                            if (this.lastNoiseCounter > this.maxSilence) {
                                 // if we are recording we should stop by stay armed.
                                 if (this.state.status == "recording") {
                                     this.split();
@@ -169,8 +174,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                         this.setState({lastClip: clipInfo});
                         if(this.saveMode == "autodecide"){
                             console.log("waveform length: " + clipInfo.waveform.length)
-                            const minSaveLength = 1000;
-                            if(clipInfo.waveform.length < minSaveLength){
+                            if(clipInfo.waveform.length < this.minSaveLength){
                                 console.log("skip saving the track since it is so short");
                                 return;
                             }
