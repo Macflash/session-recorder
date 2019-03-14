@@ -215,7 +215,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
 
         var link = document.createElement("a"); // Or maybe get it from the current document
         link.href = clipInfo.audioUrl;
-        link.download = (this.name ? this.name + "_" : "") + name + ".webm";
+        link.download = (this.name ? this.name + "_" : "") + clipInfo.name + ".webm";
         document.body.appendChild(link);
         this.download && link.click();
     }
