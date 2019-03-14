@@ -32,9 +32,6 @@ export class ClipInfo extends Component<IClipInfoProps> {
                         {clipInfo.name}
                     </div>
                     <div style={{ flex: "none" }}>
-                        <button>Edit</button>
-                    </div>
-                    <div style={{ flex: "none" }}>
                         <button onClick={this.props.onDelete}>Delete</button>
                     </div>
                 </div>
