@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { RecordButton } from '../buttons/recordButton';
 import { ButtonBar } from '../layout/buttonBar';
 import { ScreenWrapper } from '../layout/screenWrapper';
+import { TitleBar } from '../layout/titleBar';
 
 export interface IStartScreenProps {
     onStart: () => void;
@@ -12,6 +13,7 @@ export class StartScreen extends Component<IStartScreenProps> {
     render() {
         return (
             <ScreenWrapper>
+                <TitleBar title="Session Recorder" screen="start" />
                 <div style={{ padding: "10% 15px", display: "flex" }}>
                     <input
                         onChange={e => {

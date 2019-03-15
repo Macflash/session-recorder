@@ -6,7 +6,7 @@ import { StartScreen } from './components/screens/startScreen';
 import { ListenScreen } from './components/screens/listenScreen';
 
 // App has 3 states. Start, Record and Listen
-type Screen = "start" | "record" | "listen";
+export type Screen = "start" | "record" | "listen";
 
 interface IAppProps {
 }
@@ -27,7 +27,7 @@ class App extends Component<IAppProps, IAppState> {
     switch (currentScreen) {
       case "record":
         // current functionality is in <Recorder>
-        return <Recorder />;
+        return <Recorder sessionName={this.state.sessionName} />;
       case "listen":
         return <ListenScreen />
       case "start":

@@ -1,9 +1,10 @@
 import { polyfillGUM } from "./getusermedia";
 import React, { Component } from 'react';
 import { ClipInfo, IClipInfo } from "./clipInfo";
+import { TitleBar } from "./components/layout/titleBar";
 
 export interface IRecorderProps {
-
+    sessionName?: string;
 }
 
 export interface IRecorderState {
@@ -19,9 +20,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
     private readonly maxSilence = 100;
     private readonly minSaveLength = 1000;
     private lastClip?: IClipInfo;
-    private name?: string;
-    private download = false;
-    private saveMode: "saveNext" | "autodecide"| "skipNext" = "autodecide";
+    private saveMode: "saveNext" | "autodecide" | "skipNext" = "autodecide";
     private lastNoiseCounter = 0;
 
     // currently recording chunks
@@ -74,8 +73,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                             // there are some... race conditions here depending on when the recording gets stopped.
                             // should either fix this or ensure we don't trim VALID recordings
                             // it should never be able to get out of this region, but bad things would happen if it did?
-                            if (this.waveform.length > this.maxSilence && this.waveform.length < this.minSaveLength) 
-                            {
+                            if (this.waveform.length > this.maxSilence && this.waveform.length < this.minSaveLength) {
                                 this.waveform = this.waveform.slice(this.waveform.length - this.maxSilence);
                             }
                         }
@@ -102,9 +100,13 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                         canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
                         canvasCtx.lineWidth = 2;
-                        canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
-                        //canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
 
+                        if (this.state.status == "recording") {
+                            canvasCtx.strokeStyle = 'rgb(225, 0, 0)';
+                        }
+                        else {
+                            canvasCtx.strokeStyle = 'rgb(75, 75, 75)';
+                        }
 
                         var sliceWidth = WIDTH * 1.0 / this.waveform.length;
                         var x = 0;
@@ -169,23 +171,23 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                         // if it is really short DONT keep it.
 
                         this.lastClip = clipInfo;
-                        this.setState({lastClip: clipInfo});
-                        if(this.saveMode == "autodecide"){
+                        this.setState({ lastClip: clipInfo });
+                        if (this.saveMode == "autodecide") {
                             console.log("waveform length: " + clipInfo.waveform.length)
-                            if(clipInfo.waveform.length < this.minSaveLength){
+                            if (clipInfo.waveform.length < this.minSaveLength) {
                                 console.log("skip saving the track since it is so short");
                                 return;
                             }
-    
+
                             // also skip if it has very little CONTENT as a percentage. especially for very short lcips.
                         }
-                        if(this.saveMode == "skipNext"){
+                        if (this.saveMode == "skipNext") {
                             // only skip one
                             this.saveMode = "autodecide";
                             console.log("skip saving because we are in skipNext save mode");
                             return;
                         }
-                        if(this.saveMode == "saveNext"){
+                        if (this.saveMode == "saveNext") {
                             // only save one
                             this.saveMode = "autodecide";
                             console.log("force saving because we are in saveNext save mode");
@@ -206,12 +208,12 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
         this.state = { status: "initializing", clips: [] };
     }
 
-    componentDidMount(){
+    componentDidMount() {
 
     }
 
-    componentWillUnmount(){
-        if(this.stream){this.stream.stop();}
+    componentWillUnmount() {
+        if (this.stream) { this.stream.stop(); }
     }
 
     private saveClip = (clipInfo: IClipInfo) => {
@@ -264,7 +266,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
             throw "No recorder!";
         }
 
-        if(this.mediaRecorder.state == "recording" || this.mediaRecorder.state == "paused"){
+        if (this.mediaRecorder.state == "recording" || this.mediaRecorder.state == "paused") {
             this.mediaRecorder.stop();
         }
 
@@ -274,12 +276,13 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
     render() {
         const { status, clips, lastClip } = this.state;
         return <div style={{ display: "flex", flexDirection: "column", height: "100%", justifyContent: "flex-end" }}>
-            <div style={{justifyContent: "center", alignItems: "center", margin: "10px", display:"flex", fontSize: "125%"}}> { (status == "recording" || status == "armed") && "Recording" } {this.name}</div>
+            <TitleBar title={this.props.sessionName} screen="record" />
             <div style={{ overflow: "auto", flex: "auto", margin: "25px 10px" }}>
                 {clips.map((clip, i) => {
-                    return <ClipInfo key={i} clipInfo={clip} onDelete={()=>{
+                    return <ClipInfo key={i} clipInfo={clip} onDelete={() => {
                         var removed = clips.splice(i, 1);
-                        this.setState({clips: clips.slice() })}} />
+                        this.setState({ clips: clips.slice() })
+                    }} />
                 })}
             </div>
             <div style={{ flex: "none", textAlign: "center", justifyContent: "center" }}>
@@ -290,15 +293,13 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
             </div>
             <div style={{ flex: "none", display: "flex", flexDirection: "row", textAlign: "center", justifyContent: "center", alignItems: "center" }}>
                 {status == "ready" &&
-                    <button onClick={() => { this.setState({ status: "armed" })}} title="Arm for recording" style={{height: "50px", width: "50px", borderRadius: "100px", backgroundColor: "rgb(225,0,0)", border: "none", margin: "10px", cursor: "pointer"}}/>}
-                {(status == "recording" ) && <button onClick={()=>{ this.saveMode = "saveNext"; this.split()}}>Save</button>}
-                {(status == "recording" || status == "armed") && <button onClick={this.stop} title="Stop" style={{height: "50px", width: "50px", border: "none", backgroundColor:"grey", cursor: "pointer", margin: "10px"}}/>}
-                {(status == "recording") && <button onClick={()=>{ this.saveMode = "skipNext"; this.split()}}>Skip</button>}
+                    <button onClick={() => { this.setState({ status: "armed" }) }} title="Arm for recording" style={{ height: "50px", width: "50px", borderRadius: "100px", backgroundColor: "rgb(225,0,0)", border: "none", margin: "10px", cursor: "pointer" }} />}
+                {(status == "recording") && <button onClick={() => { this.saveMode = "saveNext"; this.split() }}>Save</button>}
+                {(status == "recording" || status == "armed") && <button onClick={this.stop} title="Stop" style={{ height: "50px", width: "50px", border: "none", backgroundColor: "grey", cursor: "pointer", margin: "10px" }} />}
+                {(status == "recording") && <button onClick={() => { this.saveMode = "skipNext"; this.split() }}>Skip</button>}
             </div>
             <div style={{ marginBottom: "50px", flex: "none", display: "flex", flexDirection: "row", textAlign: "center", justifyContent: "center" }}>
-                {(status == "recording" || status == "armed") ? <div>{this.name}</div> : <input type="textarea" defaultValue={this.name} onChange={e => { this.name = e.target.value; }} placeholder={"Name your session"} />}
-                <input type="checkbox" onChange={e => { this.download = e.target.checked; }} /> Save
-                {(status!="recording" && lastClip) && <button onClick={()=>{ this.saveClip(lastClip); }}>Save Last clip</button>}
+                {(status != "recording" && lastClip) && <button onClick={() => { this.saveClip(lastClip); }}>Save Last clip</button>}
             </div>
         </div>;
     }
