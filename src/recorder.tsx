@@ -13,7 +13,6 @@ export interface IRecorderState {
     recording?: "waiting for audio" | "detected sound recently" | "recording a track";
 }
 
-
 export class Recorder extends Component<IRecorderProps, IRecorderState> {
     private mediaRecorder?: MediaRecorder;
 
@@ -33,6 +32,8 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
 
     private trackCount = 1;
 
+    stream?: MediaStream;
+
     constructor(props: IRecorderProps) {
         super(props);
         polyfillGUM();
@@ -40,8 +41,8 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
             console.log('getUserMedia supported.');
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(stream => {
+                    this.stream = stream;
                     var audioContext = new AudioContext();
-
                     var audioSource = audioContext.createMediaStreamSource(stream);
                     var analyser = audioContext.createAnalyser();
                     audioSource.connect(analyser);
@@ -205,19 +206,21 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
         this.state = { status: "initializing", clips: [] };
     }
 
+    componentDidMount(){
+
+    }
+
+    componentWillUnmount(){
+        if(this.stream){this.stream.stop();}
+    }
+
     private saveClip = (clipInfo: IClipInfo) => {
-        clipInfo.name = "Track " + this.trackCount;
+        clipInfo.trackName = "Track " + this.trackCount;
         clipInfo.trackNumber = this.trackCount;
         this.trackCount++;
         this.setState({ clips: [...this.state.clips, clipInfo], lastClip: undefined });
         this.lastClip = undefined;
         this.waveform = [];
-
-        var link = document.createElement("a"); // Or maybe get it from the current document
-        link.href = clipInfo.audioUrl;
-        link.download = (this.name ? this.name + "_" : "") + clipInfo.name + ".webm";
-        document.body.appendChild(link);
-        this.download && link.click();
     }
 
     public record = () => {
