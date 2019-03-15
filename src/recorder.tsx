@@ -6,6 +6,7 @@ import { ScreenWrapper } from "./components/layout/screenWrapper";
 import { RecordButton } from "./components/buttons/recordButton";
 import { StopButton } from "./components/buttons/stopButton";
 import { ButtonBar } from "./components/layout/buttonBar";
+import { PaddedBar } from "./components/layout/paddedBar";
 
 export interface IRecorderProps {
     sessionName?: string;
@@ -199,7 +200,10 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
 
                         this.saveClip(clipInfo);
                     }
-                    this.setState({ status: "ready" });
+
+                    // actually lets go straight to armed. default is to go to "ready"
+                    this.setState({ status: "armed" });
+
                 }).catch(function (err) {
                     console.error('The following getUserMedia error occured: ' + err);
                 }
@@ -281,7 +285,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
         const { status, clips, lastClip } = this.state;
         return (
             <ScreenWrapper>
-                <TitleBar title={this.props.sessionName} screen="record" />
+                <TitleBar title={"Recording " + (this.props.sessionName || "")} screen="record" />
                 <div style={{ overflow: "auto", flex: "auto", margin: "25px 10px" }}>
                     {clips.map((clip, i) => {
                         return <ClipInfo key={i} clipInfo={clip} onDelete={() => {
@@ -290,12 +294,9 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                         }} />
                     })}
                 </div>
-                <div style={{ flex: "none", textAlign: "center", justifyContent: "center" }}>
+                <PaddedBar>
                     <canvas className="visualizer" height="100" width="1000" style={{ width: "100%" }} />
-                </div>
-                <div style={{ flex: "none", textAlign: "center", justifyContent: "center" }}>
-                    {status}
-                </div>
+                </PaddedBar>
                 <ButtonBar>
                     {(status != "recording" && lastClip) && <button onClick={() => { this.saveClip(lastClip); }}>Save</button>}
                     {(status == "recording") && <button onClick={() => { this.saveMode = "saveNext"; this.split() }}>Save</button>}

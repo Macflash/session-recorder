@@ -22,7 +22,7 @@ export class Visualizer extends Component<IVisualizerProps, IVisualizerState> {
         canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
         canvasCtx.lineWidth = 2;
-        canvasCtx.strokeStyle = 'rgb(225, 225, 225)';
+        canvasCtx.strokeStyle = 'rgb(125, 125, 225)';
 
 
         var sliceWidth = WIDTH * 1.0 / this.props.waveform.length;
@@ -56,7 +56,7 @@ export class Visualizer extends Component<IVisualizerProps, IVisualizerState> {
     }
 
     render() {
-        return <canvas height="50" width="1000" ref={c => { if(!this.clipCanvas && c){
+        return <canvas height="100" width="1000" ref={c => { if(!this.clipCanvas && c){
             this.clipCanvas = c;
             this.setState({clipCanvas: c});
         } }} style={{ flex: "auto" }} />;
