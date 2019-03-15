@@ -1,10 +1,18 @@
 import React, { Component } from 'react';
+import { ScreenWrapper } from '../layout/screenWrapper';
+import { TitleBar } from '../layout/titleBar';
+import { IScreenProps, BaseScreen } from './baseScreen';
+import { PaddedBar } from '../layout/paddedBar';
 
-export class ListenScreen extends Component {
-    render(){
-        return <div style={{display: "flex", flexDirection: "column"}}>
-            <div>Listening blah</div>
-            <div><button>Listen up!</button></div>
-        </div>;
+export interface IListScreenProps extends IScreenProps {
+}
+
+export class ListenScreen extends Component<IListScreenProps> {
+    render() {
+        return (
+            <BaseScreen title={this.props.title} screen={this.props.screen} onScreenChange={this.props.onScreenChange}>
+                <PaddedBar>Listening!</PaddedBar>
+            </BaseScreen>
+        );
     }
 }

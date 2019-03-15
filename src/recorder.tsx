@@ -7,15 +7,15 @@ import { RecordButton } from "./components/buttons/recordButton";
 import { StopButton } from "./components/buttons/stopButton";
 import { ButtonBar } from "./components/layout/buttonBar";
 import { PaddedBar } from "./components/layout/paddedBar";
+import { IScreenProps, BaseScreen } from "./components/screens/baseScreen";
 
-export interface IRecorderProps {
-    sessionName?: string;
+export interface IRecorderProps extends IScreenProps {
 }
 
 export interface IRecorderState {
     lastClip?: IClipInfo;
     clips: IClipInfo[];
-    status: "initializing" | "ready" | "armed" | "recording" | "done" | "paused"; // it looks like mediarecorder is reusable after stopping.
+    status: "initializing" | "ready" | "armed" | "recording" | "done" | "paused" | "error"; // it looks like mediarecorder is reusable after stopping.
     recording?: "waiting for audio" | "detected sound recently" | "recording a track";
 }
 
@@ -45,6 +45,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
             console.log('getUserMedia supported.');
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(stream => {
+                    console.log("we got the stream");
                     this.stream = stream;
                     var audioContext = new AudioContext();
                     var audioSource = audioContext.createMediaStreamSource(stream);
@@ -202,12 +203,12 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                     }
 
                     // actually lets go straight to armed. default is to go to "ready"
+                    console.log("armed and ready!")
                     this.setState({ status: "armed" });
 
                 }).catch(function (err) {
                     console.error('The following getUserMedia error occured: ' + err);
-                }
-                );
+                });
         }
         else {
             console.error('getUserMedia not supported on your browser!');
@@ -284,8 +285,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
     render() {
         const { status, clips, lastClip } = this.state;
         return (
-            <ScreenWrapper>
-                <TitleBar title={"Recording " + (this.props.sessionName || "")} screen="record" />
+            <BaseScreen title={"Recording " + (this.props.title || "")} screen="record" onScreenChange={this.props.onScreenChange}>
                 <div style={{ overflow: "auto", flex: "auto", margin: "25px 10px" }}>
                     {clips.map((clip, i) => {
                         return <ClipInfo key={i} clipInfo={clip} onDelete={() => {
@@ -307,7 +307,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                             title="Arm for recording"
                         />
                     }
-                    
+
                     {(status == "recording" || status == "armed") &&
                         <StopButton
                             onClick={this.stop}
@@ -315,10 +315,11 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                         />
                     }
 
-                    {(status != "recording" && lastClip) && <button onClick={() => { this.setState({lastClip: undefined}) }}>Skip</button>}
+                    {(status != "recording" && lastClip) && <button onClick={() => { this.setState({ lastClip: undefined }) }}>Skip</button>}
                     {(status == "recording") && <button onClick={() => { this.saveMode = "skipNext"; this.split() }}>Skip</button>}
                 </ButtonBar>
-            </ScreenWrapper>
+                <PaddedBar>{status}</PaddedBar>
+            </BaseScreen>
         );
     }
 }

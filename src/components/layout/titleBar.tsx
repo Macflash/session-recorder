@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
-import { Screen } from './../../App';
+import { CurrentScreen } from '../screens/baseScreen';
 
-export class TitleBar extends Component<{ title?: string, screen: Screen }> {
+export interface ITitleBarProps {
+    title?: string,
+    screen: CurrentScreen,
+    onScreenChange: (newScreen: CurrentScreen) => void
+};
+
+export class TitleBar extends Component<ITitleBarProps> {
     render() {
         const { title, screen } = this.props;
         return (
@@ -15,8 +21,8 @@ export class TitleBar extends Component<{ title?: string, screen: Screen }> {
                 }}>
                 {(status == "recording" || status == "armed") && "Recording"}
                 {title}
-                {screen == "record" && <button style={{ marginLeft: "auto" }}>Listen</button>}
-                {screen == "listen" && <button style={{ marginLeft: "auto" }}>Record</button>}
+                {(screen == "record" || screen =="start") && <button style={{ marginLeft: "auto" }} onClick={() => { this.props.onScreenChange("listen") }}>Listen</button>}
+                {screen == "listen" && <button style={{ marginLeft: "auto" }} onClick={() => { this.props.onScreenChange("record") }}>Record</button>}
             </div>
         );
     }

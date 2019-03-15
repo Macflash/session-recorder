@@ -4,17 +4,16 @@ import { ButtonBar } from '../layout/buttonBar';
 import { ScreenWrapper } from '../layout/screenWrapper';
 import { TitleBar } from '../layout/titleBar';
 import { PaddedBar } from '../layout/paddedBar';
+import { BaseScreen, IScreenProps } from './baseScreen';
 
-export interface IStartScreenProps {
-    onStart: () => void;
+export interface IStartScreenProps extends IScreenProps {
     onSessionNameChange: (name: string) => void;
 }
 
 export class StartScreen extends Component<IStartScreenProps> {
     render() {
         return (
-            <ScreenWrapper>
-                <TitleBar title="Session Recorder" screen="start" />
+            <BaseScreen title={this.props.title} screen={this.props.screen} onScreenChange={this.props.onScreenChange}>
                 <PaddedBar>
                     <input
                         onChange={e => {
@@ -32,11 +31,11 @@ export class StartScreen extends Component<IStartScreenProps> {
                 </PaddedBar>
                 <ButtonBar>
                     <RecordButton
-                        onClick={this.props.onStart}
+                        onClick={()=>{this.props.onScreenChange("record")}}
                         title="Start a new session"
                     />
                 </ButtonBar>
-            </ScreenWrapper>
+            </BaseScreen>
         );
     }
 }
