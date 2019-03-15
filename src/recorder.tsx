@@ -2,6 +2,10 @@ import { polyfillGUM } from "./getusermedia";
 import React, { Component } from 'react';
 import { ClipInfo, IClipInfo } from "./clipInfo";
 import { TitleBar } from "./components/layout/titleBar";
+import { ScreenWrapper } from "./components/layout/screenWrapper";
+import { RecordButton } from "./components/buttons/recordButton";
+import { StopButton } from "./components/buttons/stopButton";
+import { ButtonBar } from "./components/layout/buttonBar";
 
 export interface IRecorderProps {
     sessionName?: string;
@@ -275,32 +279,45 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
 
     render() {
         const { status, clips, lastClip } = this.state;
-        return <div style={{ display: "flex", flexDirection: "column", height: "100%", justifyContent: "flex-end" }}>
-            <TitleBar title={this.props.sessionName} screen="record" />
-            <div style={{ overflow: "auto", flex: "auto", margin: "25px 10px" }}>
-                {clips.map((clip, i) => {
-                    return <ClipInfo key={i} clipInfo={clip} onDelete={() => {
-                        var removed = clips.splice(i, 1);
-                        this.setState({ clips: clips.slice() })
-                    }} />
-                })}
-            </div>
-            <div style={{ flex: "none", textAlign: "center", justifyContent: "center" }}>
-                <canvas className="visualizer" height="100" width="1000" style={{ width: "100%" }} />
-            </div>
-            <div style={{ flex: "none", textAlign: "center", justifyContent: "center" }}>
-                {status}
-            </div>
-            <div style={{ flex: "none", display: "flex", flexDirection: "row", textAlign: "center", justifyContent: "center", alignItems: "center" }}>
-                {status == "ready" &&
-                    <button onClick={() => { this.setState({ status: "armed" }) }} title="Arm for recording" style={{ height: "50px", width: "50px", borderRadius: "100px", backgroundColor: "rgb(225,0,0)", border: "none", margin: "10px", cursor: "pointer" }} />}
-                {(status == "recording") && <button onClick={() => { this.saveMode = "saveNext"; this.split() }}>Save</button>}
-                {(status == "recording" || status == "armed") && <button onClick={this.stop} title="Stop" style={{ height: "50px", width: "50px", border: "none", backgroundColor: "grey", cursor: "pointer", margin: "10px" }} />}
-                {(status == "recording") && <button onClick={() => { this.saveMode = "skipNext"; this.split() }}>Skip</button>}
-            </div>
-            <div style={{ marginBottom: "50px", flex: "none", display: "flex", flexDirection: "row", textAlign: "center", justifyContent: "center" }}>
-                {(status != "recording" && lastClip) && <button onClick={() => { this.saveClip(lastClip); }}>Save Last clip</button>}
-            </div>
-        </div>;
+        return (
+            <ScreenWrapper>
+                <TitleBar title={this.props.sessionName} screen="record" />
+                <div style={{ overflow: "auto", flex: "auto", margin: "25px 10px" }}>
+                    {clips.map((clip, i) => {
+                        return <ClipInfo key={i} clipInfo={clip} onDelete={() => {
+                            var removed = clips.splice(i, 1);
+                            this.setState({ clips: clips.slice() })
+                        }} />
+                    })}
+                </div>
+                <div style={{ flex: "none", textAlign: "center", justifyContent: "center" }}>
+                    <canvas className="visualizer" height="100" width="1000" style={{ width: "100%" }} />
+                </div>
+                <div style={{ flex: "none", textAlign: "center", justifyContent: "center" }}>
+                    {status}
+                </div>
+                <ButtonBar>
+                    {(status != "recording" && lastClip) && <button onClick={() => { this.saveClip(lastClip); }}>Save</button>}
+                    {(status == "recording") && <button onClick={() => { this.saveMode = "saveNext"; this.split() }}>Save</button>}
+
+                    {status == "ready" &&
+                        <RecordButton
+                            onClick={() => { this.setState({ status: "armed" }) }}
+                            title="Arm for recording"
+                        />
+                    }
+                    
+                    {(status == "recording" || status == "armed") &&
+                        <StopButton
+                            onClick={this.stop}
+                            title="Stop"
+                        />
+                    }
+
+                    {(status != "recording" && lastClip) && <button onClick={() => { this.setState({lastClip: undefined}) }}>Skip</button>}
+                    {(status == "recording") && <button onClick={() => { this.saveMode = "skipNext"; this.split() }}>Skip</button>}
+                </ButtonBar>
+            </ScreenWrapper>
+        );
     }
 }

@@ -30,7 +30,6 @@ export class StartScreen extends Component<IStartScreenProps> {
                 </div>
                 <ButtonBar>
                     <RecordButton
-                        size="75px"
                         onClick={this.props.onStart}
                         title="Start a new session"
                     />
