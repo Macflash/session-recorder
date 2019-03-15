@@ -22,7 +22,7 @@ export class Visualizer extends Component<IVisualizerProps, IVisualizerState> {
         canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
         canvasCtx.lineWidth = 2;
-        canvasCtx.strokeStyle = 'rgb(125, 125, 225)';
+        canvasCtx.strokeStyle = 'rgb(125, 125, 125)';
 
 
         var sliceWidth = WIDTH * 1.0 / this.props.waveform.length;
