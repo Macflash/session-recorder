@@ -57,7 +57,8 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
 
                     // TODO: move this to a method
                     const draw = () => {
-                        requestAnimationFrame(draw);
+                        setTimeout(draw, 1000/60);
+                        //requestAnimationFrame(draw);
 
                         // how do we update this data while not recording?
                         // but also not do duplicates here?
@@ -153,7 +154,6 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
 
             // this is where we should decide if we keep it or not...
             // if it is really short DONT keep it.
-
             this.lastClip = clipInfo;
             this.setState({ lastClip: clipInfo });
             if (this.saveMode == "autodecide") {
@@ -163,7 +163,8 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                     return;
                 }
 
-                // also skip if it has very little CONTENT as a percentage. especially for very short lcips.
+                // TODO: also check to see how "full" the clip is. 
+                // If it is like 2 snare hits a long way apart don't keep it.
             }
             if (this.saveMode == "skipNext") {
                 // only skip one
@@ -242,6 +243,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
         this.setState({ status: "recording" });
     }
 
+    /*
     public pause = () => {
         if (!this.mediaRecorder) {
             throw "No recorder!";
@@ -259,6 +261,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
         this.mediaRecorder.resume();
         this.setState({ status: "recording" });
     }
+    */
 
     public split = () => {
         if (!this.mediaRecorder) {
