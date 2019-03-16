@@ -19,7 +19,7 @@ export class RecordButton extends PureComponent<IRecordButtonProps> {
                 borderRadius: size,
                 backgroundColor: color,
                 border: "none",
-                cursor: unclickable ? undefined : "pointer",
+                cursor: unclickable ? "unset" : "pointer",
             }}
         />
     }

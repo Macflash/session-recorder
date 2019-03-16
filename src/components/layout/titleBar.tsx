@@ -35,9 +35,17 @@ export class TitleBar extends Component<ITitleBarProps> {
                     fontSize: "125%",
                 }}>
                 {TitleBar.renderIcon(icon)}
-                <span style={{ margin: "0 10px", marginRight: "auto" }}>{title}</span>
-                {/*(screen == "record" || screen == "start") && <button style={{ marginLeft: "auto" }} onClick={() => { this.props.onScreenChange("listen") }}>Listen</button> */}
-                {screen == "listen" && <button style={{ marginLeft: "auto" }} onClick={() => { this.props.onScreenChange("record") }}>Record</button>}
+                {screen == "start"
+                    ? <a style={{ margin: "0 10px", marginRight: "auto" }} href="https://github.com/macflash/session-recorder">{title}</a>
+                    : <span style={{ margin: "0 10px", marginRight: "auto" }}>{title}</span>
+                }
+                {screen == "listen" &&
+                    <button
+                        style={{ marginLeft: "auto" }}
+                        onClick={() => { this.props.onScreenChange("record") }}
+                    >
+                        Record
+                </button>}
             </div>
         );
     }
