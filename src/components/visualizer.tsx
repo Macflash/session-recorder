@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 export interface IVisualizerProps {
     waveform: number[];
     style?: React.CSSProperties;
+    onSeek?: (percent: number) => void;
 }
 
 export interface IVisualizerState {
@@ -11,33 +12,50 @@ export interface IVisualizerState {
 
 export class Visualizer extends Component<IVisualizerProps, IVisualizerState> {
     clipCanvas: HTMLCanvasElement | null = null;
+    private lastProgress: number = 0;
 
-    componentDidUpdate() {
+    public redrawCanvas(playProgress: number) {
+        this.lastProgress = playProgress;
         if (!this.clipCanvas) { return; }
-        var canvasCtx = this.clipCanvas.getContext("2d") as CanvasRenderingContext2D;
+        const canvasCtx = this.clipCanvas.getContext("2d") as CanvasRenderingContext2D;
 
-        var WIDTH = this.clipCanvas.width
-        var HEIGHT = this.clipCanvas.height;
+        const WIDTH = this.clipCanvas.width
+        const HEIGHT = this.clipCanvas.height;
 
         canvasCtx.fillStyle = 'rgb(25, 25, 25)';
         canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
         canvasCtx.lineWidth = 2;
-        canvasCtx.strokeStyle = 'rgb(125, 125, 125)';
+        canvasCtx.strokeStyle = 'rgb(225, 225, 225)';
 
-        var sliceWidth = WIDTH * 1.0 / this.props.waveform.length;
-        var x = 0;
+        const sliceWidth = WIDTH * 1.0 / this.props.waveform.length;
+        let x = 0;
         canvasCtx.beginPath();
         canvasCtx.moveTo(0, HEIGHT / 2);
 
+        const playLength = playProgress * this.props.waveform.length;
+        let playing = true;
         for (var i = 0; i < this.props.waveform.length; i++) {
-            var v = this.props.waveform[i] / 128.0;
-            var y = v * HEIGHT / 2;
+            const v = this.props.waveform[i] / 128.0;
+            const y = v * HEIGHT / 2;
             canvasCtx.lineTo(x, y);
+
+            if (i >= playLength && playing) {
+                canvasCtx.stroke();
+                canvasCtx.beginPath();
+                canvasCtx.moveTo(x, y);
+                canvasCtx.strokeStyle = 'rgb(125, 125, 125)';
+                playing = false;
+            }
+
             x += sliceWidth;
         }
 
         canvasCtx.stroke();
+    }
+
+    componentDidUpdate() {
+        this.redrawCanvas(this.lastProgress);
     }
 
     render() {
@@ -52,6 +70,13 @@ export class Visualizer extends Component<IVisualizerProps, IVisualizerState> {
                 ref={c => {
                     if (!this.clipCanvas && c) {
                         this.clipCanvas = c;
+                        this.clipCanvas.onclick = e => {
+                            if (this.props.onSeek) {
+                                let percent = e.offsetX / c.clientWidth;
+                                console.log(percent);
+                                this.props.onSeek(percent);
+                            }
+                        }
                         this.setState({ clipCanvas: c });
                     }
                 }}

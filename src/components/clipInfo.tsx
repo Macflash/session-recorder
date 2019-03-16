@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Visualizer } from './visualizer';
 import { CloseButton } from './buttons/closeButton';
+import { ArrowButton } from './buttons/arrowButton';
+import { StopButton } from './buttons/stopButton';
 
 export interface IClipInfo {
     sessionName: string;
@@ -22,6 +24,7 @@ export interface IClipInfoProps {
 }
 
 export class ClipInfo extends Component<IClipInfoProps> {
+    public Visual: Visualizer | null = null;
     public Audio: HTMLAudioElement | null = null;
     private clipCanvas: HTMLCanvasElement | null = null;
 
@@ -35,6 +38,27 @@ export class ClipInfo extends Component<IClipInfoProps> {
         document.body.removeChild(link);
     }
 
+    getTotalTime(): number {
+        return this.Audio!.duration;
+    }
+
+    getCurrentTime(): number {
+        return this.Audio!.currentTime;
+    }
+
+    setCurrentTime(time: number) {
+        this.Audio!.currentTime = time;
+    }
+
+    onTimeUpdate = (event: Event) => {
+        console.log("time updated");
+        if(!this.Audio || !this.Visual){
+            return;
+        }
+
+        this.Visual.redrawCanvas(this.getCurrentTime() / this.getTotalTime());
+    }
+
     render() {
         const { clipInfo, showAudio, onDelete, onRename, onAudioPlayed, audioRef } = this.props;
         return (
@@ -42,33 +66,52 @@ export class ClipInfo extends Component<IClipInfoProps> {
                 <div style={{ flex: "none", display: "flex", alignItems: "center", margin: "5px" }}>
                     {clipInfo.trackNumber}
                 </div>
-                <div style={{ maxWidth:"33%", margin: "5px", justifyContent: "space-around", flex: "none", display: "flex", flexDirection: "column" }}>
-                    <div style={{ flex: "none", textOverflow: "ellipsis", overflow: "hidden"  }}>
+                <div style={{ maxWidth: "33%", margin: "5px", justifyContent: "space-around", flex: "none", display: "flex", flexDirection: "column" }}>
+                    <div style={{ flex: "none", textOverflow: "ellipsis", overflow: "hidden" }}>
                         {clipInfo.trackName}
                     </div>
                     <button onClick={onRename}>Rename</button>
                     <button onClick={this.download}>Download</button>
                 </div>
                 <div style={{ flex: "auto", display: "flex", flexDirection: "column", maxWidth: "80%", minWidth: "50%" }}>
-                    <Visualizer waveform={clipInfo.waveform} style={{ height: "50px" }} />
-                    {showAudio &&
-                        <audio
-                            ref={audio => {
-                                if (audio && audioRef) { audioRef(audio); }
-                                this.Audio = this.Audio || audio;
-                            }}
-                            onPlay={onAudioPlayed}
-                            controls
-                            style={{
-                                width: "100%",
-                                height: "40px",
-                                marginTop: "10px"
-                            }}
-                            src={clipInfo.audioUrl}
-                        />
-                    }
+                    <Visualizer
+                        onSeek={percent => {
+                            const frame = percent * this.getTotalTime();
+                            this.setCurrentTime(frame);
+                        }}
+                        ref={visual => { this.Visual = this.Visual || visual; }}
+                        waveform={clipInfo.waveform}
+                        style={{ height: "50px" }}
+                    />
+                    <audio
+                        ref={audio => {
+                            if (audio) {
+                                audio.onplay = ()=>{ this.setState({status: "playing"})};
+                                audio.ontimeupdate = this.onTimeUpdate;
+                            }
+                            if (audio && audioRef) { audioRef(audio); }
+                            this.Audio = this.Audio || audio;
+                        }}
+                        onPlay={onAudioPlayed}
+                        controls={showAudio}
+                        style={{
+                            width: "100%",
+                            height: "40px",
+                            marginTop: "10px"
+                        }}
+                        src={clipInfo.audioUrl}
+                    />
                 </div>
+                <div>
                 <CloseButton title="Delete" onClick={onDelete} />
+                
+                {/*
+                    Just use the controls they work great
+                    <ArrowButton direction="right" onClick={()=>{this.Audio!.play();}} />
+                    <StopButton onClick={()=>{this.Audio!.pause();}} />
+                */}
+
+                </div>
             </div>
         );
     }
