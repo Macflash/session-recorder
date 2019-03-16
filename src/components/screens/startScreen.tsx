@@ -13,7 +13,7 @@ export interface IStartScreenProps extends IScreenProps {
 export class StartScreen extends Component<IStartScreenProps> {
     render() {
         return (
-            <BaseScreen title={this.props.title} screen={this.props.screen} onScreenChange={this.props.onScreenChange}>
+            <BaseScreen title="Session Recorder" screen={this.props.screen} onScreenChange={this.props.onScreenChange}>
                 <PaddedBar>
                     <input
                         onChange={e => {
@@ -21,10 +21,11 @@ export class StartScreen extends Component<IStartScreenProps> {
                         }}
                         type="textfield"
                         style={{
+                            maxWidth: "calc(100% - 20px)",
                             height: "50px",
                             flex: "auto",
-                            fontSize: "200%",
-                            padding: "5px",
+                            fontSize: "150%",
+                            padding: "0 10px",
                             textAlign: "center"
                         }}
                     />

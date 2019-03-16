@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Recorder } from './recorder';
+import { Recorder } from './components/recorder';
 import { StartScreen } from './components/screens/startScreen';
 import { ListenScreen } from './components/screens/listenScreen';
 import { CurrentScreen } from './components/screens/baseScreen';
