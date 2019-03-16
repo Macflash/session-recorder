@@ -16,7 +16,7 @@ self.__precacheManifest = [
     "url": "/session-recorder/static/css/main.82b357ca.chunk.css"
   },
   {
-    "revision": "b34169905d520b769bf9d42539e73849",
+    "revision": "3307183dc3fa3245154df5d308d485f7",
     "url": "/session-recorder/index.html"
   }
 ];
