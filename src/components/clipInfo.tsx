@@ -52,7 +52,7 @@ export class ClipInfo extends Component<IClipInfoProps> {
 
     onTimeUpdate = (event: Event) => {
         console.log("time updated");
-        if(!this.Audio || !this.Visual){
+        if (!this.Audio || !this.Visual) {
             return;
         }
 
@@ -62,8 +62,8 @@ export class ClipInfo extends Component<IClipInfoProps> {
     render() {
         const { clipInfo, showAudio, onDelete, onRename, onAudioPlayed, audioRef } = this.props;
         return (
-            <div style={{ display: "flex", flexDirection: "row", height: "100px", margin: "5px" }}>
-                <div style={{ flex: "none", display: "flex", alignItems: "center", margin: "5px" }}>
+            <div style={{ display: "flex", flexDirection: "row", height: "100px", margin: "0 5px" }}>
+                <div style={{ flex: "none", display: "flex", alignItems: "center", marginRight: "5px" }}>
                     {clipInfo.trackNumber}
                 </div>
                 <div style={{ maxWidth: "33%", margin: "5px", justifyContent: "space-around", flex: "none", display: "flex", flexDirection: "column" }}>
@@ -86,7 +86,7 @@ export class ClipInfo extends Component<IClipInfoProps> {
                     <audio
                         ref={audio => {
                             if (audio) {
-                                audio.onplay = ()=>{ this.setState({status: "playing"})};
+                                audio.onplay = () => { this.setState({ status: "playing" }) };
                                 audio.ontimeupdate = this.onTimeUpdate;
                             }
                             if (audio && audioRef) { audioRef(audio); }
@@ -102,16 +102,15 @@ export class ClipInfo extends Component<IClipInfoProps> {
                         src={clipInfo.audioUrl}
                     />
                 </div>
-                <div>
+
                 <CloseButton title="Delete" onClick={onDelete} />
-                
+
                 {/*
                     Just use the controls they work great
                     <ArrowButton direction="right" onClick={()=>{this.Audio!.play();}} />
                     <StopButton onClick={()=>{this.Audio!.pause();}} />
                 */}
 
-                </div>
             </div>
         );
     }
