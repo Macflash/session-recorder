@@ -97,12 +97,14 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                     console.log("armed and ready!")
                     this.setState({ status: "armed" });
 
-                }).catch(function (err) {
+                }).catch(err => {
                     alert('The following getUserMedia error occured: ' + err);
+                    this.setState({status: "error"});
                 });
         }
         else {
             alert('getUserMedia not supported on your browser!');
+            this.setState({status: "error"});
         }
 
         this.state = { status: "initializing", clips: [] };

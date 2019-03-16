@@ -36,7 +36,7 @@ export class TitleBar extends Component<ITitleBarProps> {
                 }}>
                 {TitleBar.renderIcon(icon)}
                 <span style={{ margin: "0 10px" }}>{title}</span>
-                {(screen == "record" || screen == "start") && <button style={{ marginLeft: "auto" }} onClick={() => { this.props.onScreenChange("listen") }}>Listen</button>}
+                {/*(screen == "record" || screen == "start") && <button style={{ marginLeft: "auto" }} onClick={() => { this.props.onScreenChange("listen") }}>Listen</button> */}
                 {screen == "listen" && <button style={{ marginLeft: "auto" }} onClick={() => { this.props.onScreenChange("record") }}>Record</button>}
             </div>
         );

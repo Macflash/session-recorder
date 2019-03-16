@@ -11,7 +11,7 @@ export class ListenScreen extends Component<IListScreenProps> {
     render() {
         return (
             <BaseScreen title={this.props.title} screen={this.props.screen} onScreenChange={this.props.onScreenChange}>
-                <PaddedBar>Listening!</PaddedBar>
+                <PaddedBar>Ooo, show all sessions and an option to create a new session</PaddedBar>
             </BaseScreen>
         );
     }
