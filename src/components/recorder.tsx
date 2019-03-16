@@ -15,6 +15,7 @@ export interface IRecorderProps extends IScreenProps {
 }
 
 export interface IRecorderState {
+    stream?: MediaStream;
     lastClip?: IClipInfo;
     clips: IClipInfo[];
     status: "initializing" | "ready" | "armed" | "recording" | "done" | "paused" | "error"; // it looks like mediarecorder is reusable after stopping.
@@ -92,9 +93,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
 
                     draw();
 
-
                     // actually lets go straight to armed. default is to go to "ready"
-                    console.log("armed and ready!")
                     this.setState({ status: "armed" });
 
                 }).catch(err => {
@@ -120,6 +119,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
 
     private initializeAudioStream(stream: MediaStream) {
         this.stream = stream;
+        this.setState({ stream });
 
         // Set up AnalyserNode for waveform rendering
         var audioContext = new AudioContext();
@@ -160,7 +160,6 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
             this.lastClip = clipInfo;
             this.setState({ lastClip: clipInfo });
             if (this.saveMode == "autodecide") {
-                console.log("waveform length: " + clipInfo.waveform.length)
                 if (clipInfo.waveform.length < this.minSaveLength) {
                     console.log("skip saving the track since it is so short");
                     return;
@@ -306,10 +305,21 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
         }
     }
 
+    stopAudio = () => {
+        this.props.onScreenChange("start");
+    }
+
     render() {
-        const { status, clips, lastClip } = this.state;
+        const { status, clips, lastClip, stream } = this.state;
+        const onStopAudio = stream ? this.stopAudio : undefined;
         return (
-            <BaseScreen icon={status as any} title={"Recording " + (this.props.title || "")} screen="record" onScreenChange={this.props.onScreenChange}>
+            <BaseScreen
+                screen="record"
+                icon={status as any}
+                title={"Recording " + (this.props.title || "")}
+                onScreenChange={this.props.onScreenChange}
+                onStopAudio={onStopAudio}
+            >
                 <TrackList
                     clips={clips}
                     onClipPlayed={this.stop}

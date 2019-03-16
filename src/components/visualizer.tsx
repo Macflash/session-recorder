@@ -73,7 +73,6 @@ export class Visualizer extends Component<IVisualizerProps, IVisualizerState> {
                         this.clipCanvas.onclick = e => {
                             if (this.props.onSeek) {
                                 let percent = e.offsetX / c.clientWidth;
-                                console.log(percent);
                                 this.props.onSeek(percent);
                             }
                         }

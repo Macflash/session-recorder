@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { CurrentScreen } from '../screens/baseScreen';
 import { RecordButton } from '../buttons/recordButton';
+import { CloseButton } from '../buttons/closeButton';
 
 export type Icon = "recording" | "armed";
 
@@ -8,7 +9,8 @@ export interface ITitleBarProps {
     icon?: Icon,
     title?: string,
     screen: CurrentScreen,
-    onScreenChange: (newScreen: CurrentScreen) => void
+    onScreenChange: (newScreen: CurrentScreen) => void,
+    onStopAudio?: () => void;
 };
 
 export class TitleBar extends Component<ITitleBarProps> {
@@ -23,7 +25,7 @@ export class TitleBar extends Component<ITitleBarProps> {
     }
 
     render() {
-        const { title, screen, icon } = this.props;
+        const { title, screen, icon, onStopAudio } = this.props;
         return (
             <div
                 style={{
@@ -46,6 +48,7 @@ export class TitleBar extends Component<ITitleBarProps> {
                     >
                         Record
                 </button>}
+                {onStopAudio && <CloseButton size="25px" title="Stop audio" onClick={onStopAudio} />}
             </div>
         );
     }

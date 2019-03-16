@@ -51,7 +51,6 @@ export class ClipInfo extends Component<IClipInfoProps> {
     }
 
     onTimeUpdate = (event: Event) => {
-        console.log("time updated");
         if (!this.Audio || !this.Visual) {
             return;
         }
@@ -62,18 +61,40 @@ export class ClipInfo extends Component<IClipInfoProps> {
     render() {
         const { clipInfo, showAudio, onDelete, onRename, onAudioPlayed, audioRef } = this.props;
         return (
-            <div style={{ display: "flex", flexDirection: "row", height: "100px", margin: "0 5px" }}>
+            <div style={{
+                display: "flex",
+                flexDirection: "row",
+                height: "100px",
+                margin: "5px 0",
+                justifyContent: "space-between",
+                alignItems: "center"
+            }}>
                 <div style={{ flex: "none", display: "flex", alignItems: "center", marginRight: "5px" }}>
                     {clipInfo.trackNumber}
                 </div>
-                <div style={{ maxWidth: "33%", margin: "5px", justifyContent: "space-around", flex: "none", display: "flex", flexDirection: "column" }}>
+                <div style={{
+                    maxWidth: "33%",
+                    margin: "0 5px",
+                    justifyContent: "space-around",
+                    flex: "none",
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%"
+                }}>
                     <div style={{ flex: "none", textOverflow: "ellipsis", overflow: "hidden" }}>
                         {clipInfo.trackName}
                     </div>
                     <button onClick={onRename}>Rename</button>
                     <button onClick={this.download}>Download</button>
                 </div>
-                <div style={{ flex: "auto", display: "flex", flexDirection: "column", maxWidth: "80%", minWidth: "50%" }}>
+                <div style={{
+                    flex: "auto",
+                    display: "flex",
+                    flexDirection: "column",
+                    maxWidth: "80%",
+                    minWidth: "50%",
+                    margin: "0 5px"
+                }}>
                     <Visualizer
                         onSeek={percent => {
                             const frame = percent * this.getTotalTime();
@@ -103,7 +124,7 @@ export class ClipInfo extends Component<IClipInfoProps> {
                     />
                 </div>
 
-                <CloseButton title="Delete" onClick={onDelete} />
+                <CloseButton size="50px" title="Delete" onClick={onDelete} />
 
                 {/*
                     Just use the controls they work great

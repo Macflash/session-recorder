@@ -6,15 +6,15 @@ export interface ICloseButtonProps  extends IButtonProps{
 
 export class CloseButton extends PureComponent<ICloseButtonProps> {
     render() {
-        const size = this.props.size || "75px";
         return <button
             className="close"
             onClick={this.props.onClick}
             title={this.props.title}
             style={{
+                height: this.props.size,
+                width: this.props.size || "75px",
                 backgroundColor: "transparent",
                 border: "none",
-                width: "75px",
                 cursor: "pointer"
             }}
         />
