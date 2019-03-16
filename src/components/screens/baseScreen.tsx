@@ -14,7 +14,7 @@ export class BaseScreen extends Component<IScreenProps> {
     render() {
         return (
             <ScreenWrapper>
-                <TitleBar title={this.props.title} screen={this.props.screen} onScreenChange={this.props.onScreenChange} />
+                <TitleBar {...this.props} />
                 {this.props.children}
             </ScreenWrapper>
         );

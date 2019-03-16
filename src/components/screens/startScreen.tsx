@@ -14,8 +14,9 @@ export class StartScreen extends Component<IStartScreenProps> {
     render() {
         return (
             <BaseScreen title="Session Recorder" screen={this.props.screen} onScreenChange={this.props.onScreenChange}>
-                <PaddedBar style={{height: "100px"}}>
+                <PaddedBar style={{ height: "100px" }}>
                     <input
+                        placeholder="Enter a name your session..."
                         onChange={e => {
                             this.props.onSessionNameChange(e.target.value);
                         }}
@@ -32,7 +33,7 @@ export class StartScreen extends Component<IStartScreenProps> {
                 </PaddedBar>
                 <ButtonBar>
                     <RecordButton
-                        onClick={()=>{this.props.onScreenChange("record")}}
+                        onClick={() => { this.props.onScreenChange("record") }}
                         title="Start a new session"
                     />
                 </ButtonBar>

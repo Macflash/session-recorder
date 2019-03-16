@@ -303,7 +303,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
     render() {
         const { status, clips, lastClip } = this.state;
         return (
-            <BaseScreen title={"Recording " + (this.props.title || "")} screen="record" onScreenChange={this.props.onScreenChange}>
+            <BaseScreen icon={status as any} title={"Recording " + (this.props.title || "")} screen="record" onScreenChange={this.props.onScreenChange}>
                 <TrackList
                     clips={clips}
                     onClipPlayed={this.stop}

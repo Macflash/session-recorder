@@ -7,14 +7,15 @@ export interface IArrowButtonProps extends IButtonProps {
 
 export class ArrowButton extends PureComponent<IArrowButtonProps> {
     render() {
-        const { direction, disabled, size = "75px" } = this.props;
+        const { onClick, title, direction, disabled, size = "75px" } = this.props;
         const height = "calc(.5 * " + size + ")";
         const width = "calc(.8 *" + size + ")";
         const color = disabled ? "rgb(50,50,50)" : "rgb(125,125,125)";
+        const unclickable = disabled || !onClick;
         return <button
-            disabled={disabled}
-            onClick={this.props.onClick}
-            title={this.props.title}
+            disabled={unclickable}
+            onClick={onClick}
+            title={title}
             style={{
                 height: 0,
                 width: 0,
@@ -23,7 +24,7 @@ export class ArrowButton extends PureComponent<IArrowButtonProps> {
                 borderBottom: height + " solid transparent",
                 borderLeft: direction == "right" ? width + " solid " + color : "none",
                 borderRight: direction == "left" ? width + " solid " + color : "none",
-                cursor: disabled ? undefined : "pointer"
+                cursor: unclickable ? undefined : "pointer"
             }}
         />
     }

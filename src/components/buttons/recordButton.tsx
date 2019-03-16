@@ -6,17 +6,20 @@ export interface IRecordButtonProps extends IButtonProps {
 
 export class RecordButton extends PureComponent<IRecordButtonProps> {
     render() {
-        const size = this.props.size || "75px";
+        const { onClick, title, disabled, size = "75px" } = this.props;
+        const color = disabled ? "rgb(125,0,0)" : "rgb(225,0,0)";
+        const unclickable = disabled || !onClick;
         return <button
-            onClick={this.props.onClick}
-            title={this.props.title}
+            onClick={onClick}
+            title={title}
+            disabled={unclickable}
             style={{
                 height: size,
                 width: size,
                 borderRadius: size,
-                backgroundColor: "rgb(225,0,0)",
+                backgroundColor: color,
                 border: "none",
-                cursor: "pointer"
+                cursor: unclickable ? undefined : "pointer",
             }}
         />
     }
