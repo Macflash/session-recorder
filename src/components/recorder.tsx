@@ -149,6 +149,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
             const clipInfo: IClipInfo = {
                 audioUrl,
                 waveform: this.waveform,
+                sessionName: this.props.title,
             } as IClipInfo;
 
             this.chunks = [];
