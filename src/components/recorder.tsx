@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { ClipInfo, IClipInfo } from "./clipInfo";
 import { TitleBar } from "./layout/titleBar";
 import { ScreenWrapper } from "./layout/screenWrapper";
+import { ArrowButton } from "./buttons/arrowButton";
 import { RecordButton } from "./buttons/recordButton";
 import { StopButton } from "./buttons/stopButton";
 import { ButtonBar } from "./layout/buttonBar";
@@ -280,6 +281,25 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
         this.setState({ status: "ready" });
     }
 
+    private renderMainButton(): React.ReactNode {
+        const { status } = this.state;
+        switch (status) {
+            case "ready":
+                return <RecordButton
+                    onClick={() => { this.setState({ status: "armed" }) }}
+                    title="Arm for recording"
+                />;
+            case "armed":
+            case "recording":
+                return <StopButton
+                    onClick={this.stop}
+                    title="Stop"
+                />;
+            default:
+                return <div style={{height: "75px", color: "rgb(50,50,50)", display:"flex", alignItems: "center", textAlign: "center"}}>{status}</div>;
+        }
+    }
+
     render() {
         const { status, clips, lastClip } = this.state;
         return (
@@ -296,25 +316,31 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                     <canvas className="visualizer" height="100" width="1000" style={{ width: "100%", height: "100px" }} />
                 </PaddedBar>
                 <ButtonBar>
-                    {(status != "recording" && lastClip) && <button onClick={() => { this.saveClip(lastClip); }}>Save</button>}
-                    {(status == "recording") && <button onClick={() => { this.saveMode = "saveNext"; this.split() }}>Save</button>}
 
-                    {status == "ready" &&
-                        <RecordButton
-                            onClick={() => { this.setState({ status: "armed" }) }}
-                            title="Arm for recording"
-                        />
-                    }
+                    <ArrowButton
+                        size="50px"
+                        direction="left"
+                        title="Save"
+                        disabled={status != "recording" && !lastClip}
+                        onClick={() => {
+                            if (status == "recording") { this.saveMode = "saveNext"; this.split() }
+                            else if (lastClip) { this.saveClip(lastClip); }
+                        }}
+                    />
 
-                    {(status == "recording" || status == "armed") &&
-                        <StopButton
-                            onClick={this.stop}
-                            title="Stop"
-                        />
-                    }
+                    {this.renderMainButton()}
 
-                    {(status != "recording" && lastClip) && <button onClick={() => { this.setState({ lastClip: undefined }) }}>Skip</button>}
-                    {(status == "recording") && <button onClick={() => { this.saveMode = "skipNext"; this.split() }}>Skip</button>}
+                    <ArrowButton
+                        size="50px"
+                        direction="right"
+                        title="Skip"
+                        disabled={status != "recording" && !lastClip}
+                        onClick={() => {
+                            if (status == "recording") { this.saveMode = "skipNext"; this.split() }
+                            else if (lastClip) { this.setState({ lastClip: undefined }); }
+                        }}
+                    />
+
                 </ButtonBar>
             </BaseScreen>
         );

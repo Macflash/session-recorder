@@ -1,9 +1,7 @@
 import React, { Component, PureComponent } from 'react';
+import { IButtonProps } from './buttonProps';
 
-export interface IRecordButtonProps {
-    onClick: () => void;
-    title: string;
-    size?: string;
+export interface IRecordButtonProps extends IButtonProps {
 }
 
 export class RecordButton extends PureComponent<IRecordButtonProps> {

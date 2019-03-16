@@ -1,9 +1,7 @@
 import React, { Component, PureComponent } from 'react';
+import { IButtonProps } from './buttonProps';
 
-export interface IStopButtonProps {
-    onClick: () => void;
-    title: string;
-    size?: string;
+export interface IStopButtonProps  extends IButtonProps{
 }
 
 export class StopButton extends PureComponent<IStopButtonProps> {

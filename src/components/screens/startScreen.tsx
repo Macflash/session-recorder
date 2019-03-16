@@ -14,7 +14,7 @@ export class StartScreen extends Component<IStartScreenProps> {
     render() {
         return (
             <BaseScreen title="Session Recorder" screen={this.props.screen} onScreenChange={this.props.onScreenChange}>
-                <PaddedBar>
+                <PaddedBar style={{height: "100px"}}>
                     <input
                         onChange={e => {
                             this.props.onSessionNameChange(e.target.value);
