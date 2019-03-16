@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 export interface IVisualizerProps {
     waveform: number[];
+    style?: React.CSSProperties;
 }
 
 export interface IVisualizerState {
@@ -40,9 +41,21 @@ export class Visualizer extends Component<IVisualizerProps, IVisualizerState> {
     }
 
     render() {
-        return <canvas height="100" width="1000" ref={c => { if(!this.clipCanvas && c){
-            this.clipCanvas = c;
-            this.setState({clipCanvas: c});
-        } }} style={{ flex: "auto" }} />;
+        return (
+            <canvas
+                height="100"
+                width="1000"
+                style={{
+                    flex: "auto",
+                    ...this.props.style
+                }}
+                ref={c => {
+                    if (!this.clipCanvas && c) {
+                        this.clipCanvas = c;
+                        this.setState({ clipCanvas: c });
+                    }
+                }}
+            />
+        );
     }
 }

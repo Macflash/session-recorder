@@ -15,9 +15,10 @@ export class TitleBar extends Component<ITitleBarProps> {
                 style={{
                     justifyContent: "space-between",
                     alignItems: "center",
+                    paddingBottom: "5%",
                     marginBottom: "auto",
                     display: "flex",
-                    fontSize: "125%"
+                    fontSize: "125%",
                 }}>
                 {(status == "recording" || status == "armed") && "Recording"}
                 {title}

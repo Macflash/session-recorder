@@ -14,7 +14,7 @@ export class TrackList extends Component<{ clips: IClipInfo[], onClipPlayed?: ()
     render() {
         const { clips, onClipPlayed, onDelete } = this.props;
         return (
-            <div style={{ overflow: "auto", flex: "auto", margin: "25px 10px" }}>
+            <div style={{ overflow: "auto", flex: "auto", padding: "5px" }}>
                 {clips.map((clip, i) => {
                     return <ClipInfo
                         showAudio

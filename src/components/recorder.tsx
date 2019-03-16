@@ -193,7 +193,9 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
             // there are some... race conditions here depending on when the recording gets stopped.
             // should either fix this or ensure we don't trim VALID recordings
             // it should never be able to get out of this region, but bad things would happen if it did?
-            if (this.waveform.length > this.maxSilence && this.waveform.length < this.minSaveLength) {
+            if (this.waveform.length > this.maxSilence
+                && this.waveform.length < this.maxSilence + 10) {
+                // wowza this is horrible. just making the race condition smaller...
                 this.waveform = this.waveform.slice(this.waveform.length - this.maxSilence);
             }
         }
@@ -291,7 +293,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                     }}
                 />
                 <PaddedBar>
-                    <canvas className="visualizer" height="100" width="1000" style={{ width: "100%" }} />
+                    <canvas className="visualizer" height="100" width="1000" style={{ width: "100%", height: "100px" }} />
                 </PaddedBar>
                 <ButtonBar>
                     {(status != "recording" && lastClip) && <button onClick={() => { this.saveClip(lastClip); }}>Save</button>}

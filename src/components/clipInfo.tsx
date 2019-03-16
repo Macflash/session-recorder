@@ -39,7 +39,7 @@ export class ClipInfo extends Component<IClipInfoProps> {
             <div style={{ display: "flex", flexDirection: "row", height: "100px", margin: "5px" }}>
                 <div style={{ flex: "none", display: "flex", alignItems: "center", margin: "5px" }}>{clipInfo.trackNumber}</div>
                 <div style={{ flex: "auto", display: "flex", flexDirection: "column", maxWidth: "80%", minWidth: "50%" }}>
-                    <Visualizer waveform={clipInfo.waveform} />
+                    <Visualizer waveform={clipInfo.waveform} style={{height: "50px"}}/>
                     {showAudio &&
                         <audio
                             ref={audio => {

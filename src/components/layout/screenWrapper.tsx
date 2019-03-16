@@ -5,8 +5,11 @@ export class ScreenWrapper extends Component {
         return (
             <div
                 style={{
+                    MsUserSelect: "none",
+                    MozUserSelect: "none",
+                    userSelect: "none",
                     position: "absolute",
-                    top: "5%",
+                    top: "2.5%",
                     bottom: "5%",
                     left: "5%",
                     right: "5%",
