@@ -57,7 +57,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
 
                     // TODO: move this to a method
                     const draw = () => {
-                        setTimeout(draw, 1000/60);
+                        setTimeout(draw, 1000 / 60);
                         //requestAnimationFrame(draw);
 
                         // how do we update this data while not recording?
@@ -99,12 +99,12 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
 
                 }).catch(err => {
                     alert('The following getUserMedia error occured: ' + err);
-                    this.setState({status: "error"});
+                    this.setState({ status: "error" });
                 });
         }
         else {
             alert('getUserMedia not supported on your browser!');
-            this.setState({status: "error"});
+            this.setState({ status: "error" });
         }
 
         this.state = { status: "initializing", clips: [] };
@@ -292,7 +292,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
         switch (status) {
             case "ready":
                 return <RecordButton
-                    onClick={() => { this.setState({ status: "armed" }) }}
+                    onClick={() => { this.setState({ status: "armed" }); }}
                     title="Arm for recording"
                 />;
             case "armed":
@@ -302,7 +302,7 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                     title="Stop"
                 />;
             default:
-                return <div style={{height: "75px", color: "rgb(50,50,50)", display:"flex", alignItems: "center", textAlign: "center"}}>{status}</div>;
+                return <div style={{ height: "75px", color: "rgb(50,50,50)", display: "flex", alignItems: "center", textAlign: "center" }}>{status}</div>;
         }
     }
 
@@ -315,6 +315,12 @@ export class Recorder extends Component<IRecorderProps, IRecorderState> {
                     onClipPlayed={this.stop}
                     onDelete={i => {
                         var removed = clips.splice(i, 1);
+                        this.setState({ clips: clips.slice() })
+                    }}
+                    onRename={i => {
+                        var clip = JSON.parse(JSON.stringify(clips[i])) as IClipInfo;
+                        clip.trackName = prompt("Rename '" + clip.trackName + "'") || clip.trackName;
+                        clips[i] = clip;
                         this.setState({ clips: clips.slice() })
                     }}
                 />

@@ -23,11 +23,15 @@
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+button {
+  border: rgb(125,125,125) 1px solid;
+  background-color: transparent;
+  color: rgb(175,175,175);
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+button:hover{
+  color: rgb(225,225,225);
+  border: rgb(225,225,225) 1px solid;
 }

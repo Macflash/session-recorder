@@ -17,6 +17,7 @@ export class ArrowButton extends PureComponent<IArrowButtonProps> {
             onClick={onClick}
             title={title}
             style={{
+                padding: 0,
                 height: 0,
                 width: 0,
                 backgroundColor: "transparent",

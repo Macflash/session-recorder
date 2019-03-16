@@ -1,7 +1,14 @@
 import React, { Component } from 'react';
 import { IClipInfo, ClipInfo } from './clipInfo';
 
-export class TrackList extends Component<{ clips: IClipInfo[], onClipPlayed?: () => void, onDelete: (index: number) => void }> {
+export interface ITrackListProps {
+    clips: IClipInfo[];
+    onClipPlayed?: () => void;
+    onDelete: (index: number) => void;
+    onRename: (index: number) => void;
+}
+
+export class TrackList extends Component<ITrackListProps> {
     private audioElements: HTMLAudioElement[] = [];
     public stopAllClips(exceptClip?: number) {
         this.audioElements.forEach((a, i) => {
@@ -12,7 +19,7 @@ export class TrackList extends Component<{ clips: IClipInfo[], onClipPlayed?: ()
     }
 
     render() {
-        const { clips, onClipPlayed, onDelete } = this.props;
+        const { clips, onClipPlayed, onDelete, onRename } = this.props;
         return (
             <div style={{ overflow: "auto", flex: "auto", padding: "5px" }}>
                 {clips.map((clip, i) => {
@@ -21,6 +28,7 @@ export class TrackList extends Component<{ clips: IClipInfo[], onClipPlayed?: ()
                         audioRef={a => { if (a) { this.audioElements[i] = a; } }}
                         key={i}
                         clipInfo={clip}
+                        onRename={() => { onRename(i); }}
                         onDelete={() => { onDelete(i); }}
                         onAudioPlayed={() => {
                             // stop other audio clips
